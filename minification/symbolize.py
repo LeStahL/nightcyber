@@ -37,6 +37,11 @@ if rest == []:
     print("Error: No input files passed on commandline.")
     exit()
 
+restored_rest = []
+for filename in rest:
+    restored_rest += [ 'gfx/' + filename.split('/')[-1] ]
+rest = restored_rest
+
 print("Packing: ",rest)
 
 # Get available symbols

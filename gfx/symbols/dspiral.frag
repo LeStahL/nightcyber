@@ -1,5 +1,7 @@
 #version 130
 
+const float pi = acos(-1.);
+
 float dspiral(vec2 x, float a, float d)
 {
     float p = atan(x.y, x.x),

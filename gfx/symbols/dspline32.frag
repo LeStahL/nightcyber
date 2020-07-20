@@ -11,7 +11,7 @@ void dspline32(in vec2 x, in vec2 p0, in vec2 p1, in vec2 p2, in vec2 p3, out fl
 {
     float da;
     vec2 pc = mix(p1,p2,.5);
-    dspline2(x, p0, p1, pc, d);
-    dspline2(x, pc, p2, p3, da);
+    dspline22(x, p0, p1, pc, d);
+    dspline22(x, pc, p2, p3, da);
     d = min(d, da);
 }

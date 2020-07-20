@@ -37,23 +37,7 @@ find_package(Qt5 COMPONENTS Core Widgets Gui Multimedia)
 
 set(COMMON_HEADERS config_types.h config.h glext.h engine/platform.h engine/renderer.h engine/shader.h engine/loader.h engine/orchestrator.h engine/midi.h engine/debug.h)
 set(SFX_SHADER sfx.frag)
-set(SHADER_FILES
-        gfx/load.frag
-        gfx/logo210.frag
-        gfx/logo210text.frag
-        gfx/blockmania.frag
-        gfx/blockmaniatext.frag
-        gfx/edgysphere.frag
-        gfx/edgyspheretext.frag
-        gfx/tentacles.frag
-        gfx/tentaclestext.frag
-        gfx/post.frag
-        gfx/debug.frag
-        gfx/corona.frag
-        gfx/coronatext.frag
-        gfx/menger.frag
-        gfx/mengertext.frag
-)
+file(GLOB SHADER_FILES LIST_DIRECTORIES false "gfx/*.frag")
 set(SHADER_SYMBOLS_PATH gfx/symbols/)
 file(GLOB SHADER_SYMBOLS_FILES LIST_DIRECTORIES false "${SHADER_SYMBOLS_PATH}/*.frag")
 set(STRINGS_FILE font/strings.txt)
@@ -67,9 +51,8 @@ add_custom_target(verify_shaders
     SOURCES ${SHADER_FILES} ${SHADER_SYMBOLS_FILES}
 )
 foreach(SHADER_FILE ${SHADER_FILES} ${SHADER_SYMBOLS_FILES})
-    add_custom_command(TARGET verify_shaders COMMAND echo "--${SHADER_FILE}:" COMMAND scomp "${CMAKE_SOURCE_DIR}/${SHADER_FILE}")
+    add_custom_command(TARGET verify_shaders COMMAND echo "--${SHADER_FILE}:" COMMAND scomp "${SHADER_FILE}")
 endforeach()
-
 
 #################################
 # Demo executable

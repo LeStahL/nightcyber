@@ -157,7 +157,7 @@ int __cdecl main()
     dm.dmPelsHeight = 1080;
     dm.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
 
-    ShowWindow(hwnd, TRUE);
+    ShowWindow(hwnd, FALSE);
     UpdateWindow(hwnd);
 
     PIXELFORMATDESCRIPTOR pfd =
@@ -192,13 +192,12 @@ PFD_TYPE_RGBA,                                              // The kind of frame
     glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader");
     glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)wglGetProcAddress("glGetShaderInfoLog");
     glGetShaderiv = (PFNGLGETSHADERIVPROC)wglGetProcAddress("glGetShaderiv");
-    char buffer[1024];
+    char buffer[2048];
     sprintf(buffer, "%ws", szArglist[1]);
-    FILE *f = fopen(buffer, "rt");
+    FILE *f = fopen(buffer, "rb");
     if (!f)
     {
         printf("==== Error: Could not open file: %ws ====\n", buffer);
-        PostQuitMessage(0);
         ExitProcess(-1);
         return -1;
     }
@@ -207,6 +206,8 @@ PFD_TYPE_RGBA,                                              // The kind of frame
     fseek(f, 0, SEEK_SET);
     char *shaderSource = (char *)malloc((size + 1) * sizeof(char));
     fread(shaderSource, 1, size, f);
+    shaderSource[size] = 0;
+    ++size;
     fclose(f);
 
     int handle = glCreateShader(GL_FRAGMENT_SHADER);
@@ -223,8 +224,8 @@ PFD_TYPE_RGBA,                                              // The kind of frame
         GLchar *compilerError = (GLchar*)malloc(errorLogLength*sizeof(GLchar));
         glGetShaderInfoLog(handle, errorLogLength, NULL, compilerError);
         printf("%s\n", compilerError);
-        return -1;
         ExitProcess(-1);
+        return -1;
     }
     printf("Successfully compiled Shader: %s\n", buffer);
 

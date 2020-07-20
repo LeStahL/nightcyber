@@ -42,8 +42,8 @@ void dvoronoi2(in vec2 x, out float d, out vec2 p, out float control_distance)
         for(float j=-2.; j<2.; j+=1.)
         {
             if(i==0. && j==0.) continue;
-            hash22(1.e2*(y+vec3(i,j,k)), dp);
-            dp += y+vec3(i,j,k);
+            hash22(1.e2*(y+vec2(i,j)), dp);
+            dp += y+vec2(i,j);
             vec2 o = p - dp;
             float l = length(o);
             d = min(d,abs(.5*l-dot(x-dp,o)/l));
