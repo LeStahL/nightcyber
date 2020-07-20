@@ -55,7 +55,20 @@ set(SHADER_FILES
         gfx/mengertext.frag
 )
 set(SHADER_SYMBOLS_PATH gfx/symbols/)
+file(GLOB SHADER_SYMBOLS_FILES LIST_DIRECTORIES false "${SHADER_SYMBOLS_PATH}/*.frag")
 set(STRINGS_FILE font/strings.txt)
+
+#################################
+# Shader compiler executable
+#################################
+add_subdirectory(cmake)
+add_custom_target(verify_shaders
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+    SOURCES ${SHADER_FILES} ${SHADER_SYMBOLS_FILES}
+)
+foreach(SHADER_FILE ${SHADER_FILES} ${SHADER_SYMBOLS_FILES})
+    add_custom_command(TARGET verify_shaders COMMAND echo "--${SHADER_FILE}:" COMMAND scomp "${CMAKE_SOURCE_DIR}/${SHADER_FILE}")
+endforeach()
 
 
 #################################
@@ -100,6 +113,8 @@ add_executable(neuroque
 add_dependencies(neuroque minify_sfx)
 add_dependencies(neuroque minify_shaders)
 add_dependencies(neuroque texture_packing)
+add_dependencies(neuroque scomp)
+add_dependencies(neuroque verify_shaders)
 
 target_include_directories(neuroque SYSTEM PRIVATE "${OPENGL_INCLUDE_DIR}")
 
