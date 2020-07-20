@@ -111,16 +111,16 @@ PFNGLLINKPROGRAMPROC glLinkProgram;
 PFNGLUSEPROGRAMPROC glUseProgram;
 PFNGLGETSHADERIVPROC glGetShaderiv;
 PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
+PFNGLDELETESHADERPROC glDeleteShader;
 
 int __cdecl main()
 {
     LPWSTR *szArglist;
     int nArgs;
-    int i;
 
     szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
     {
-        if (i <= 1)
+        if (nArgs <= 1)
         {
             printf("==== Error: No command line arguments provided to scomp.exe. Check your call. ====\n");
             ExitProcess(-1);
@@ -192,42 +192,51 @@ PFD_TYPE_RGBA,                                              // The kind of frame
     glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader");
     glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)wglGetProcAddress("glGetShaderInfoLog");
     glGetShaderiv = (PFNGLGETSHADERIVPROC)wglGetProcAddress("glGetShaderiv");
+    glDeleteShader = (PFNGLDELETESHADERPROC)wglGetProcAddress("glDeleteShader");
     char buffer[2048];
-    sprintf(buffer, "%ws", szArglist[1]);
-    FILE *f = fopen(buffer, "rb");
-    if (!f)
+    
+    for(int i=1; i<nArgs; ++i)
     {
-        printf("==== Error: Could not open file: %ws ====\n", buffer);
-        ExitProcess(-1);
-        return -1;
-    }
-    fseek(f, 0, SEEK_END);
-    int size = ftell(f);
-    fseek(f, 0, SEEK_SET);
-    char *shaderSource = (char *)malloc((size + 1) * sizeof(char));
-    fread(shaderSource, 1, size, f);
-    shaderSource[size] = 0;
-    ++size;
-    fclose(f);
+        sprintf(buffer, "%ws\0", szArglist[i]);
+        printf("Processing file: %s\n", buffer);
+        FILE *f = fopen(buffer, "rb");
+        if (!f)
+        {
+            printf("==== Error: Could not open file: %s ====\n", buffer);
+            ExitProcess(-1);
+            return -1;
+        }
+        fseek(f, 0, SEEK_END);
+        int size = ftell(f);
+        fseek(f, 0, SEEK_SET);
+        char *shaderSource = (char *)malloc((size + 1) * sizeof(char));
+        fread(shaderSource, 1, size, f);
+        shaderSource[size] = 0;
+        ++size;
+        fclose(f);
 
-    int handle = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(handle, 1, (const GLchar **)&shaderSource, &size);
-    glCompileShader(handle);
+        int handle = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(handle, 1, (const GLchar **)&shaderSource, &size);
+        glCompileShader(handle);
 
-    GLint compileStatus;
-    glGetShaderiv(handle, GL_COMPILE_STATUS, &compileStatus);
-    if (compileStatus != GL_TRUE)
-    {
-        printf("==== Error in %s: ====\n\n", buffer);
-        GLint errorLogLength;
-        glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &errorLogLength);
-        GLchar *compilerError = (GLchar*)malloc(errorLogLength*sizeof(GLchar));
-        glGetShaderInfoLog(handle, errorLogLength, NULL, compilerError);
-        printf("%s\n", compilerError);
-        ExitProcess(-1);
-        return -1;
+        GLint compileStatus;
+        glGetShaderiv(handle, GL_COMPILE_STATUS, &compileStatus);
+        if (compileStatus != GL_TRUE)
+        {
+            printf("==== Error in %s: ====\n\n", buffer);
+            GLint errorLogLength;
+            glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &errorLogLength);
+            GLchar *compilerError = (GLchar*)malloc(errorLogLength*sizeof(GLchar));
+            glGetShaderInfoLog(handle, errorLogLength, NULL, compilerError);
+            printf("%s\n", compilerError);
+            free(shaderSource);
+            ExitProcess(-1);
+            return -1;
+        }
+        printf("Successfully compiled Shader: %s\n", buffer);
+        glDeleteShader(handle);
+        free(shaderSource);
     }
-    printf("Successfully compiled Shader: %s\n", buffer);
 
     ExitProcess(0);
     return 0;

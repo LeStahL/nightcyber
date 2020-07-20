@@ -1,3 +1,5 @@
+#version 130
+
 // Extrusion
 void zextrude(in float z, in float d2d, in float h, out float d)
 {

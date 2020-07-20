@@ -49,10 +49,8 @@ add_subdirectory(cmake)
 add_custom_target(verify_shaders
     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
     SOURCES ${SHADER_FILES} ${SHADER_SYMBOLS_FILES}
+    COMMAND scomp ${SHADER_FILES} ${SHADER_SYMBOLS_FILES}
 )
-foreach(SHADER_FILE ${SHADER_FILES} ${SHADER_SYMBOLS_FILES})
-    add_custom_command(TARGET verify_shaders COMMAND echo "--${SHADER_FILE}:" COMMAND scomp "${SHADER_FILE}")
-endforeach()
 
 #################################
 # Demo executable
