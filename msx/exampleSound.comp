@@ -1,0 +1,12 @@
+#version 430
+
+layout(local_size_x = 1) in;
+layout(rg16f, binding = 0) uniform image2D output;
+
+void main() {
+  int index = int(gl_GlobalInvocationID.x);
+
+  vec2 pixel = vec2(sin(float(index)));
+  
+  imageStore(output, index, pixel);
+}
