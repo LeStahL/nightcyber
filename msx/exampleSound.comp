@@ -4,9 +4,14 @@ layout(local_size_x = 1) in;
 layout(rg16f, binding = 0) uniform image1D result;
 
 void main() {
-  int index = int(gl_GlobalInvocationID.x);
+    int index = int(gl_GlobalInvocationID.x);
 
-  vec4 pixel = vec4(sin(float(index)));
+    vec2 s = vec2(sin(float(index)));
   
-  imageStore(result, index, pixel);
+    vec2 v  = floor((0.5+0.5*s)*65535.0);
+    vec2 vl = mod(v,256.0)/255.0;
+    vec2 vh = floor(v/256.0)/255.0;
+    vec4 pixel = vec4(vl.x,vh.x,vl.y,vh.y);
+
+    imageStore(result, index, pixel);
 }
