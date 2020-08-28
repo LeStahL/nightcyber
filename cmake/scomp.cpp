@@ -19,10 +19,14 @@
 #include <windows.h>
 #include <stdio.h>
 #include <shellapi.h>
+#include <string>
 
 #include "GL/GL.h"
+#include "GL/wgl.h"
+#include "GL/wglext.h"
 #include "glext.h"
 
+PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
 PFNGLCREATESHADERPROC glCreateShader;
 PFNGLCREATEPROGRAMPROC glCreateProgram;
 PFNGLSHADERSOURCEPROC glShaderSource;
@@ -108,18 +112,34 @@ PFD_TYPE_RGBA,                                              // The kind of frame
     HGLRC glrc = wglCreateContext(hdc);
     wglMakeCurrent(hdc, glrc);
 
+    wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
     glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader");
     glShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource");
     glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader");
     glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)wglGetProcAddress("glGetShaderInfoLog");
     glGetShaderiv = (PFNGLGETSHADERIVPROC)wglGetProcAddress("glGetShaderiv");
     glDeleteShader = (PFNGLDELETESHADERPROC)wglGetProcAddress("glDeleteShader");
+
+    GLint attribs[] =
+    {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+        0
+    };
+
+    glrc = wglCreateContextAttribsARB(hdc, 0, attribs);
+    wglMakeCurrent(hdc, glrc);
+
     char buffer[2048];
     
+    const std::string STRING_FRAG = ".frag";
     for(int i=1; i<nArgs; ++i)
     {
         sprintf(buffer, "%ws\0", szArglist[i]);
+        const std::string filename = buffer;
         printf("Processing file: %s\n", buffer);
+        bool isFragmentShader = filename.compare(filename.size() - STRING_FRAG.size(), STRING_FRAG.size(), STRING_FRAG) == 0;
         FILE *f = fopen(buffer, "rb");
         if (!f)
         {
@@ -136,7 +156,7 @@ PFD_TYPE_RGBA,                                              // The kind of frame
         ++size;
         fclose(f);
 
-        int handle = glCreateShader(GL_FRAGMENT_SHADER);
+        int handle = glCreateShader(isFragmentShader ? GL_FRAGMENT_SHADER : GL_COMPUTE_SHADER);
         glShaderSource(handle, 1, (const GLchar **)&shaderSource, &size);
         glCompileShader(handle);
 

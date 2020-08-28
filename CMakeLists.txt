@@ -33,13 +33,13 @@ set(CMAKE_AUTOUIC ON)
 # Find the right python interpreter version
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 find_package(OpenGL REQUIRED COMPONENTS OpenGL)
-find_package(Qt5 COMPONENTS Core Widgets Gui Multimedia)
+find_package(Qt5 COMPONENTS Core Widgets Gui Multimedia OpenGL)
 
 set(COMMON_HEADERS config_types.h config.h glext.h engine/platform.h engine/renderer.h engine/shader.h engine/loader.h engine/orchestrator.h engine/midi.h engine/debug.h)
 set(SFX_SHADER sfx.frag)
-file(GLOB SHADER_FILES LIST_DIRECTORIES false "gfx/*.frag")
-set(SHADER_SYMBOLS_PATH gfx/symbols/)
-file(GLOB SHADER_SYMBOLS_FILES LIST_DIRECTORIES false "${SHADER_SYMBOLS_PATH}/*.frag")
+file(GLOB SHADER_FILES LIST_DIRECTORIES false RELATIVE "${PROJECT_SOURCE_DIR}" "gfx/*.frag" "msx/*.comp")
+set(SHADER_SYMBOLS_PATH gfx/symbols)
+file(GLOB SHADER_SYMBOLS_FILES LIST_DIRECTORIES false RELATIVE "${PROJECT_SOURCE_DIR}" "${SHADER_SYMBOLS_PATH}/*.frag")
 set(STRINGS_FILE font/strings.txt)
 
 #################################
@@ -47,7 +47,7 @@ set(STRINGS_FILE font/strings.txt)
 #################################
 add_subdirectory(cmake)
 add_custom_target(verify_shaders
-    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
     SOURCES ${SHADER_FILES} ${SHADER_SYMBOLS_FILES}
     COMMAND scomp ${SHADER_FILES} ${SHADER_SYMBOLS_FILES}
 )
@@ -70,7 +70,7 @@ set(SHADER_HEADER shaders.gen.h)
 add_custom_target(minify_shaders
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/
     COMMAND "${Python3_EXECUTABLE}" minification/symbolize.py ${SHADER_FILES} -s ${SHADER_SYMBOLS_PATH} -o ${SHADER_HEADER}
-    SOURCES minification/symbolize.py minification/Rule.py minification/Token.py minification/GLSLLexer130.py minification/Compressor.py ${SHADER_FILES}
+    SOURCES minification/symbolize.py minification/Rule.py minification/Token.py ${SHADER_FILES}
     BYPRODUCTS ${SHADER_HEADER}
 )
 
@@ -103,7 +103,7 @@ target_link_libraries(neuroque OpenGL::GL)
 
 if(MSVC)
     set_target_properties(neuroque PROPERTIES LINK_FLAGS "/ENTRY:demo /SUBSYSTEM:Windows /OPT:REF /OPT:ICF=10 /VERBOSE /NODEFAULTLIB")
-    target_compile_options(neuroque PRIVATE /Gy /O1 /fp:fast /GR- /GS- /MT )
+    target_compile_options(neuroque PRIVATE /Gy /fp:fast /GR- /GS- /MT)
 
     if (MSVC_VERSION GREATER_EQUAL 1910) # VS2017
         target_link_libraries(neuroque User32.lib Winmm.lib ucrt.lib msvcrt.lib vcruntime.lib Vfw32.lib)
@@ -113,6 +113,7 @@ if(MSVC)
     endif()
 
     if (CMAKE_SIZEOF_VOID_P EQUAL 4 AND MINIFY_64K AND (MSVC_IDE OR CMAKE_BUILD_TYPE STREQUAL "Release"))
+        target_compile_options(neuroque PRIVATE /O1)
         target_compile_definitions(neuroque PRIVATE "$<$<CONFIG:RELEASE>:MINIFY_64K>")
         find_program(KKRUNCHY_K7 kkrunchy_k7.exe HINTS "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}/bin")
         add_custom_command(TARGET neuroque COMMAND "$<$<CONFIG:RELEASE>:${KKRUNCHY_K7}>" ARGS --best "$<TARGET_FILE:neuroque>" --out "$<TARGET_FILE_DIR:neuroque>/neuroquec.exe" POST_BUILD)

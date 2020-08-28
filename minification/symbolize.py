@@ -1,6 +1,5 @@
 # Hardcyber - PC-64k-Intro by Team210 at Deadline 2k19
-# Copyright (C) 2019  Alexander Kraus <nr4@z10.info>
-# Copyright (C) 2019  DaDummy <c.anselm@paindevs.com>
+# Copyright (C) 2020  Alexander Kraus <nr4@z10.info>, DaDummy <c.anselm@paindevs.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,6 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
+import re
 import argparse
 
 from importlib.machinery import SourceFileLoader
@@ -24,8 +24,6 @@ src_path = os.path.dirname(os.path.abspath(__file__))
 
 Rule = SourceFileLoader("Rule", src_path + "/Rule.py").load_module()
 Token = SourceFileLoader("Token", src_path + "/Token.py").load_module()
-GLSLLexer130 = SourceFileLoader("GLSLLexer130", src_path + "/GLSLLexer130.py").load_module()
-Compressor = SourceFileLoader("Compressor", src_path + "/Compressor.py").load_module()
 
 # Parse command line args
 parser = argparse.ArgumentParser(description='Team210 symbol packer.')
@@ -37,18 +35,13 @@ if rest == []:
     print("Error: No input files passed on commandline.")
     exit()
 
-restored_rest = []
-for filename in rest:
-    restored_rest += [ 'gfx/' + filename.split('/')[-1] ]
-rest = restored_rest
-
 print("Packing: ",rest)
 
 # Get available symbols
 symbol_files = os.listdir(args.symbols)
 
 # Remove all files that do not have ".frag" ending
-symbol_files = [ f for f in symbol_files if f.endswith('.frag') ]
+symbol_files = [ f for f in symbol_files if f.endswith('.frag') or f.endswith('.comp') ]
 symbol_names = [ f.replace('.frag', '') for f in symbol_files ]
 
 # Read all symbol code from symbol files
@@ -58,10 +51,10 @@ for symbol_file in symbol_files:
     with open(args.symbols+"/"+symbol_file, "rt") as f:
         symbol_code = f.read()
         f.close()
-    symbol_codes += [ Compressor.compress(symbol_code).replace('\"','\\\"').replace('\n', '\\n\"\n\"').replace('#version 130', '#version 130\\n')]
+    symbol_codes += [ symbol_code.replace('\"','\\\"').replace('\n', '\\n\"\n\"')]
 
 # Generate compilation header
-header_source = "//Generated with Symbolize (c) 2019 Alexander Kraus <nr4@z10.info>, DaDummy <c.anselm@paindevs.com>.\n#ifndef "
+header_source = "//Generated with Symbolize (c) 2020 Alexander Kraus <nr4@z10.info>, DaDummy <c.anselm@paindevs.com>.\n#ifndef "
 if args.out == None:
     header_source += "SYMBOLIZE_H" + "\n#define " + "SYMBOLIZE_H" + "\n"
 else:
@@ -73,7 +66,7 @@ scene_sources = []
 scene_symbol_lists = []
 scene_uniform_lists = []
 for inputfile in rest:
-    scene_names += [ inputfile.replace(".frag", "").replace("/", "_") ]
+    scene_names += [ inputfile.replace(".frag", "").replace(".comp", "").replace("/", "_") ]
     
     input_source_lines = None
     input_source = ""
@@ -81,7 +74,7 @@ for inputfile in rest:
         input_source = f.read()
         f.close()
     #print(input_source)
-    scene_sources += [ Compressor.compress(input_source).replace('\"','\\\"').replace('\n', '\\n\"\n\"').replace('#version 130', '#version 130\\n') ]
+    scene_sources += [ input_source.replace('\"','\\\"').replace('\n', '\\n\"\n\"') ]
     input_source_lines = input_source.split('\n')
     input_source_lines = [ l + "\n" for l in input_source_lines ]
     #print(input_source_lines)
@@ -101,10 +94,10 @@ for inputfile in rest:
     scene_uniform_list = []
     for line in input_source_lines:
         if 'uniform' in line:
-            types_list = [ 'float', 'int', 'vec2', 'vec3', 'vec4', 'sampler2D', 'sampler1D', 'sampler3D', 'bool', 'uniform' ]
+            types_list = [ 'float', 'int', 'vec2', 'vec3', 'vec4', 'sampler2D', 'sampler1D', 'sampler3D', 'bool', 'uniform', 'layout\(.*\)' ]
             modified_line = line.replace(',', ' ').replace(';','')
             for types in types_list:
-                modified_line = modified_line.replace(types, '')
+                modified_line = re.sub(types, '', modified_line)
             scene_uniform_list += modified_line.split()
     scene_uniform_lists += [ scene_uniform_list ]
     print("Contained uniforms: ",scene_uniform_list)
@@ -129,7 +122,7 @@ header_source += "static struct ShaderSymbol shader_symbols[] = {\n"
 for i in range(len(symbol_codes)):
     header_source += "    {0, GL_FRAGMENT_SHADER, \"" + symbol_codes[i] + "\"},\n"
 for i in range(len(scene_sources)):
-    header_source += "    {0, GL_FRAGMENT_SHADER, \"" + scene_sources[i] + "\"},\n"
+    header_source += "    {0, " + ('GL_FRAGMENT_SHADER' if rest[i].endswith('.frag') else 'GL_COMPUTE_SHADER') + ", \"" + scene_sources[i] + "\"},\n"
 header_source += "};\n\n"
 
 # Write out control structures for scene load and information regarding uniforms
