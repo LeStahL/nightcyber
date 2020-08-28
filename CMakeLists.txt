@@ -164,3 +164,12 @@ endif()
 
 # Copy music and sounds to target folder
 add_custom_command(TARGET neuroque COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/msx" "$<TARGET_FILE_DIR:neuroque>/msx")
+
+# Add target for release packing
+add_custom_target(create_release_archive
+    WORKING_DIRECTORY "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/Team210.nfo" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/Team210.nfo"
+    COMMAND ${CMAKE_COMMAND} -E tar "cfv" "${PROJECT_NAME}-Team210.zip" --format=zip
+    "$<TARGET_FILE:neuroque>"
+       "$<TARGET_FILE_DIR:${PROJECT_NAME}>/Team210.nfo"
+)
