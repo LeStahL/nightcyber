@@ -7,7 +7,7 @@
 #	include <Windows.h>
 #endif
 #include <gl/GL.h>
-#include <glext.h>
+#include <GL/glext.h>
 
 
 static int w = 1920, h = 1080;

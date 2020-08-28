@@ -36,8 +36,8 @@ static const struct OpenGLSettings opengl_settings = {
     CompatibilityProfile, // profile
 	DoubleBuffer, // swapChain
 
-    2, // majorVersion
-    1, // minorVersion
+    4, // majorVersion
+    3, // minorVersion
 
 	0, // useSRGB
 

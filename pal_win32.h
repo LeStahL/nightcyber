@@ -23,7 +23,10 @@
 
 #ifdef DEBUG
 #include "engine/debug.h"
-#endif 
+#endif
+
+#include <GL/wgl.h>
+#include <GL/wglext.h>
 
 void *malloc(size_t size)
 {
@@ -520,6 +523,19 @@ int WINAPI demo(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, in
 
 	glrc = wglCreateContext(hdc);
 	wglMakeCurrent(hdc, glrc);
+
+	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
+
+	GLint attribs[] =
+    {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, opengl_settings.majorVersion,
+        WGL_CONTEXT_MINOR_VERSION_ARB, opengl_settings.minorVersion,
+        WGL_CONTEXT_PROFILE_MASK_ARB, opengl_settings.profile == CompatibilityProfile ? WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB : WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+        0
+    };
+
+    glrc = wglCreateContextAttribsARB(hdc, 0, attribs);
+    wglMakeCurrent(hdc, glrc);
 
     rInitializeRenderer();
 

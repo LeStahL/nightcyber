@@ -35,7 +35,7 @@ find_package(Python3 REQUIRED COMPONENTS Interpreter)
 find_package(OpenGL REQUIRED COMPONENTS OpenGL)
 find_package(Qt5 COMPONENTS Core Widgets Gui Multimedia OpenGL)
 
-set(COMMON_HEADERS config_types.h config.h glext.h engine/platform.h engine/renderer.h engine/shader.h engine/loader.h engine/orchestrator.h engine/midi.h engine/debug.h)
+set(COMMON_HEADERS config_types.h config.h GL/glext.h GL/wgl.h GL/wglext.h engine/platform.h engine/renderer.h engine/shader.h engine/loader.h engine/orchestrator.h engine/midi.h engine/debug.h)
 set(SFX_SHADER sfx.frag)
 file(GLOB SHADER_FILES LIST_DIRECTORIES false RELATIVE "${PROJECT_SOURCE_DIR}" "gfx/*.frag" "msx/*.comp")
 set(SHADER_SYMBOLS_PATH gfx/symbols)

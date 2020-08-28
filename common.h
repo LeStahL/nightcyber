@@ -50,7 +50,7 @@ const char *demoname = "Corona";
 #endif
 
 #include <GL/gl.h>
-#include <glext.h>
+#include <GL/glext.h>
 
 
 #define clamp(x, minimum, maximum) min(max(x, minimum), maximum)

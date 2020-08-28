@@ -24,7 +24,7 @@
 #include "GL/GL.h"
 #include "GL/wgl.h"
 #include "GL/wglext.h"
-#include "glext.h"
+#include "GL/glext.h"
 
 PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
 PFNGLCREATESHADERPROC glCreateShader;
