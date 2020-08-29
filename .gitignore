@@ -7,7 +7,6 @@ build
 /CMakeSettings.json
 /CMakeLists.txt.*
 bin
-.vscode
 
 # Generated headers
 /shaders.gen.h
