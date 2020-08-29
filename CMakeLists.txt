@@ -17,7 +17,7 @@
 
 cmake_minimum_required(VERSION 3.12)
 
-project(neuroque)
+project(nightcyber)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Configurables
@@ -82,7 +82,7 @@ add_custom_target(texture_packing
     BYPRODUCTS ${FONT_HEADER}
 )
 
-add_executable(neuroque
+add_executable(${PROJECT_NAME}
     ls.cpp
     ${COMMON_HEADERS}
     ${DEMO_HEADERS}
@@ -91,40 +91,40 @@ add_executable(neuroque
     ${FRAGMENT_SHADERS}
     ${SHADER_FILES}
 )
-add_dependencies(neuroque minify_sfx)
-add_dependencies(neuroque minify_shaders)
-add_dependencies(neuroque texture_packing)
-add_dependencies(neuroque scomp)
-add_dependencies(neuroque verify_shaders)
+add_dependencies(${PROJECT_NAME} minify_sfx)
+add_dependencies(${PROJECT_NAME} minify_shaders)
+add_dependencies(${PROJECT_NAME} texture_packing)
+add_dependencies(${PROJECT_NAME} scomp)
+add_dependencies(${PROJECT_NAME} verify_shaders)
 
-target_include_directories(neuroque SYSTEM PRIVATE "${OPENGL_INCLUDE_DIR}")
+target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE "${OPENGL_INCLUDE_DIR}")
 
-target_link_libraries(neuroque OpenGL::GL)
+target_link_libraries(${PROJECT_NAME} OpenGL::GL)
 
 if(MSVC)
-    set_target_properties(neuroque PROPERTIES LINK_FLAGS "/ENTRY:demo /SUBSYSTEM:Windows /OPT:REF /OPT:ICF=10 /VERBOSE /NODEFAULTLIB")
-    target_compile_options(neuroque PRIVATE /Gy /fp:fast /GR- /GS- /MT)
+    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ENTRY:demo /SUBSYSTEM:Windows /OPT:REF /OPT:ICF=10 /VERBOSE /NODEFAULTLIB")
+    target_compile_options(${PROJECT_NAME} PRIVATE /Gy /fp:fast /GR- /GS- /MT)
 
     if (MSVC_VERSION GREATER_EQUAL 1910) # VS2017
-        target_link_libraries(neuroque User32.lib Winmm.lib ucrt.lib msvcrt.lib vcruntime.lib Vfw32.lib)
+        target_link_libraries(${PROJECT_NAME} User32.lib Winmm.lib ucrt.lib msvcrt.lib vcruntime.lib Vfw32.lib)
     else()
         # for debug output: User32.lib ucrt.lib msvcrt.lib
-        target_link_libraries(neuroque User32.lib Winmm.lib ucrt.lib msvcrt.lib)
+        target_link_libraries(${PROJECT_NAME} User32.lib Winmm.lib ucrt.lib msvcrt.lib)
     endif()
 
     if (CMAKE_SIZEOF_VOID_P EQUAL 4 AND MINIFY_64K AND (MSVC_IDE OR CMAKE_BUILD_TYPE STREQUAL "Release"))
-        target_compile_options(neuroque PRIVATE /O1)
-        target_compile_definitions(neuroque PRIVATE "$<$<CONFIG:RELEASE>:MINIFY_64K>")
+        target_compile_options(${PROJECT_NAME} PRIVATE /O1)
+        target_compile_definitions(${PROJECT_NAME} PRIVATE "$<$<CONFIG:RELEASE>:MINIFY_64K>")
         find_program(KKRUNCHY_K7 kkrunchy_k7.exe HINTS "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}/bin")
-        add_custom_command(TARGET neuroque COMMAND "$<$<CONFIG:RELEASE>:${KKRUNCHY_K7}>" ARGS --best "$<TARGET_FILE:neuroque>" --out "$<TARGET_FILE_DIR:neuroque>/neuroquec.exe" POST_BUILD)
+        add_custom_command(TARGET ${PROJECT_NAME} COMMAND "$<$<CONFIG:RELEASE>:${KKRUNCHY_K7}>" ARGS --best "$<TARGET_FILE:${PROJECT_NAME}>" --out "$<TARGET_FILE_DIR:${PROJECT_NAME}>/${PROJECT_NAME}c.exe" POST_BUILD)
     endif()
 else()
     find_package(SDL2 REQUIRED)
-    target_include_directories(neuroque SYSTEM PRIVATE ${SDL2_INCLUDE_DIRS})
-    target_link_libraries(neuroque ${SDL2_LIBRARIES})
+    target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${SDL2_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})
 endif()
 
-target_include_directories(neuroque PRIVATE "${CMAKE_SOURCE_DIR}/thirdparty/minimp3")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/thirdparty/minimp3")
 
 #################################
 # Studio executable
@@ -164,13 +164,13 @@ if(WIN32)
 endif()
 
 # Copy music and sounds to target folder
-add_custom_command(TARGET neuroque COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/msx" "$<TARGET_FILE_DIR:neuroque>/msx")
+add_custom_command(TARGET ${PROJECT_NAME} COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/msx" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/msx")
 
 # Add target for release packing
 add_custom_target(create_release_archive
     WORKING_DIRECTORY "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/Team210.nfo" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/Team210.nfo"
     COMMAND ${CMAKE_COMMAND} -E tar "cfv" "${PROJECT_NAME}-Team210.zip" --format=zip
-    "$<TARGET_FILE:neuroque>"
+    "$<TARGET_FILE:${PROJECT_NAME}>"
        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/Team210.nfo"
 )
