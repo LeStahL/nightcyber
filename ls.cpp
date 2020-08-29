@@ -309,6 +309,8 @@ void load_compressed_sound()
     nblocks1 = sample_rate * duration1 / block_size + 1;
     music1_size = nblocks1 * block_size;
     smusic1 = (float *)malloc(4 * music1_size);
+    scale = (double *)malloc(4 * music1_size);
+    nBeats = (double *)malloc(4 * music1_size);
     short *dest = (short *)smusic1;
     for (int i = 0; i < 2 * music1_size; ++i)
         dest[i] = 0;
