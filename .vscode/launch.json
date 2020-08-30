@@ -13,7 +13,8 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": false
+            "externalConsole": false,
+            "visualizerFile": "c:\\Users\\NR4\\AppData\\Roaming\\Code\\User\\workspaceStorage\\faedd5fa720bef384a5e48d88c50d512\\tonka3000.qtvsctools\\qt.natvis.xml"
         }
     ]
 }

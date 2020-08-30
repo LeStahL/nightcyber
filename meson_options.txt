@@ -1,2 +1,3 @@
 option('kkrunchy', type: 'boolean', value: true)
 option('squishy', type: 'boolean', value: true)
+option('crinkler', type: 'boolean', value: true)

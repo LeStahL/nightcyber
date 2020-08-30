@@ -1,0 +1,6 @@
+[wrap-git]
+url = https://github.com/waddlesplash/QMidi
+revision = 024e7f810f3b348ada1f973a4f392b892e98dbbb
+
+[provide]
+dependency_names = QMidi
