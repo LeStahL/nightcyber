@@ -429,9 +429,13 @@ void compute_test()
   ssbo_type* ssbo_copy = (ssbo_type*)malloc(sizeof(ssbo_type));
   cCopyFromBuffer(ssbo, ssbo_copy, sizeof(ssbo_type));
 
+  cFreeBuffer(ssbo);
+
   for (int i = 0; i < ssbo_size_x; ++i) {
     printf("(%f, %f), ", ssbo_copy->result[i][0], ssbo_copy->result[i][1]);
   }
+
+  free(ssbo_copy);
 }
 
 void load_demo()
