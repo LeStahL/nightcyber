@@ -1,0 +1,23 @@
+#version 430
+
+#define N_NOTES 1024
+#define N_SAMPLES 440000
+#define N_SAMPLES_TRACK 4400000
+
+layout(local_size_x = 1)in;
+
+layout(std430, binding = 0)buffer InputType
+{
+    vec2 input[N_SAMPLES][N_NOTES];
+};
+
+layout(std430, binding = 1)buffer ResultType
+{
+    vec2 result[N_SAMPLES_TRACK];
+};
+
+void main() {
+    ivec2 index = ivec2(gl_GlobalInvocationID.xy);
+    
+    result[index.x] = input[0][index.x % N_SAMPLES];
+}
