@@ -35,14 +35,15 @@ if rest == []:
     print("Error: No input files passed on commandline.")
     exit()
 
-print("Packing: ",rest)
+print("Packing: ", rest)
 
 # Get available symbols
 symbol_files = os.listdir(args.symbols)
 
 # Remove all files that do not have ".frag" ending
-symbol_files = [ f for f in symbol_files if f.endswith('.frag') or f.endswith('.comp') ]
-symbol_names = [ f.replace('.frag', '') for f in symbol_files ]
+symbol_files = [f for f in symbol_files if f.endswith(
+    '.frag') or f.endswith('.comp')]
+symbol_names = [f.replace('.frag', '') for f in symbol_files]
 
 # Read all symbol code from symbol files
 symbol_codes = []
@@ -51,7 +52,8 @@ for symbol_file in symbol_files:
     with open(args.symbols+"/"+symbol_file, "rt") as f:
         symbol_code = f.read()
         f.close()
-    symbol_codes += [ symbol_code.replace('\"','\\\"').replace('\n', '\\n\"\n\"')]
+    symbol_codes += [symbol_code.replace('\"',
+                                         '\\\"').replace('\n', '\\n\"\n\"')]
 
 # Generate compilation header
 header_source = "//Generated with Symbolize (c) 2020 Alexander Kraus <nr4@z10.info>, DaDummy <c.anselm@paindevs.com>.\n#ifndef "
@@ -66,41 +68,45 @@ scene_sources = []
 scene_symbol_lists = []
 scene_uniform_lists = []
 for inputfile in rest:
-    scene_names += [ inputfile.replace(".frag", "").replace(".comp", "").replace("/", "_") ]
-    
+    scene_names += [inputfile.replace(".frag",
+                                      "").replace(".comp", "").replace("/", "_")]
+
     input_source_lines = None
     input_source = ""
     with open(inputfile, "rt") as f:
         input_source = f.read()
         f.close()
-    #print(input_source)
-    scene_sources += [ input_source.replace('\"','\\\"').replace('\n', '\\n\"\n\"') ]
+    # print(input_source)
+    scene_sources += [
+        input_source.replace('\"', '\\\"').replace('\n', '\\n\"\n\"')
+    ]
     input_source_lines = input_source.split('\n')
-    input_source_lines = [ l + "\n" for l in input_source_lines ]
-    #print(input_source_lines)
-    
+    input_source_lines = [l + "\n" for l in input_source_lines]
+    # print(input_source_lines)
+
     # Extract symbol list from source file
     scene_symbol_list = []
     for line in input_source_lines:
         if 'void' in line and ';' in line and (not '#' in line):
             s = line.split()
             symbol_name = s[s.index('void') + 1].split('(')[0]
-            if not symbol_name in symbol_list: 
-                symbol_list += [ symbol_name ]
-            scene_symbol_list += [ symbol_name ]
-    scene_symbol_lists += [ scene_symbol_list ]
+            if not symbol_name in symbol_list:
+                symbol_list += [symbol_name]
+            scene_symbol_list += [symbol_name]
+    scene_symbol_lists += [scene_symbol_list]
 
     # Extract uniform list from source file
     scene_uniform_list = []
     for line in input_source_lines:
         if 'uniform' in line:
-            types_list = [ 'float', 'int', 'vec2', 'vec3', 'vec4', 'sampler2D', 'sampler1D', 'sampler3D', 'bool', 'uniform', 'layout\(.*\)' ]
-            modified_line = line.replace(',', ' ').replace(';','')
+            types_list = ['float', 'int', 'vec2', 'vec3', 'vec4', 'sampler1D', 'sampler2D', 'sampler3D', 'image1D', 'image2D',
+                          'image3D', 'bool', 'uniform', 'layout\(.*\)', 'coherent', 'writeonly', 'readonly', 'volatile', 'restrict']
+            modified_line = line.replace(',', ' ').replace(';', '')
             for types in types_list:
                 modified_line = re.sub(types, '', modified_line)
             scene_uniform_list += modified_line.split()
-    scene_uniform_lists += [ scene_uniform_list ]
-    print("Contained uniforms: ",scene_uniform_list)
+    scene_uniform_lists += [scene_uniform_list]
+    print("Contained uniforms: ", scene_uniform_list)
 
 # Remove unused symbols
 symIdx = 0
@@ -120,34 +126,51 @@ while symIdx < len(symbol_names):
 # Write out all remaining symbols and all scenes into a continous array for simple loading
 header_source += "static struct ShaderSymbol shader_symbols[] = {\n"
 for i in range(len(symbol_codes)):
-    header_source += "    {0, GL_FRAGMENT_SHADER, \"" + symbol_codes[i] + "\"},\n"
+    header_source += "    {0, GL_FRAGMENT_SHADER, \"" + \
+        symbol_codes[i] + "\"},\n"
 for i in range(len(scene_sources)):
-    header_source += "    {0, " + ('GL_FRAGMENT_SHADER' if rest[i].endswith('.frag') else 'GL_COMPUTE_SHADER') + ", \"" + scene_sources[i] + "\"},\n"
+    header_source += "    {0, " + ('GL_FRAGMENT_SHADER' if rest[i].endswith(
+        '.frag') else 'GL_COMPUTE_SHADER') + ", \"" + scene_sources[i] + "\"},\n"
 header_source += "};\n\n"
 
 # Write out control structures for scene load and information regarding uniforms
 for i in range(len(scene_names)):
-    header_source += "const static unsigned short shader_" + scene_names[i] + "_symbols[] = { "
+    header_source += "const static unsigned short shader_" + \
+        scene_names[i] + "_symbols[] = { "
     header_source += str(len(symbol_names) + i) + ","
     for symbol in scene_symbol_lists[i]:
         header_source += str(symbol_names.index(symbol)) + ","
     header_source += " };\n"
-    header_source += "static struct Uniform shader_" + scene_names[i] + "_uniforms[] = {\n"
-    for j in range(len(scene_uniform_lists[i])):
-        header_source += "    { 0, \"" + scene_uniform_lists[i][j] + "\" },\n"
-    header_source += "};\n"
-    for j in range(len(scene_uniform_lists[i])):
-        header_source += "#define shader_uniform_" + scene_names[i] + "_" + scene_uniform_lists[i][j] + " (shader_" + scene_names[i] + "_uniforms[" + str(j) + "].location)\n"
+    if len(scene_uniform_lists[i]) > 0:
+        header_source += "static struct Uniform shader_" + \
+            scene_names[i] + "_uniforms[] = {\n"
+        for j in range(len(scene_uniform_lists[i])):
+            header_source += "    { 0, \"" + \
+                scene_uniform_lists[i][j] + "\" },\n"
+        header_source += "};\n"
+        for j in range(len(scene_uniform_lists[i])):
+            header_source += "#define shader_uniform_" + \
+                scene_names[i] + "_" + scene_uniform_lists[i][j] + \
+                " (shader_" + scene_names[i] + \
+                "_uniforms[" + str(j) + "].location)\n"
     header_source += "\n"
 header_source += "\n"
 
 # List all scenes into another continous array for simple loading
 header_source += "static struct ShaderProgram shader_programs[] = {\n"
 for i in range(len(scene_names)):
-    header_source += "    { 0, ARRAYSIZE(shader_" + scene_names[i] + "_symbols), ARRAYSIZE(shader_" + scene_names[i] + "_uniforms), shader_" + scene_names[i] + "_symbols, shader_" + scene_names[i] + "_uniforms },\n"
+    if len(scene_uniform_lists[i]) > 0:
+        header_source += "    { 0, ARRAYSIZE(shader_" + scene_names[i] + "_symbols), ARRAYSIZE(shader_" + scene_names[i] + \
+            "_uniforms), shader_" + \
+            scene_names[i] + "_symbols, shader_" + \
+            scene_names[i] + "_uniforms },\n"
+    else:
+        header_source += "    { 0, ARRAYSIZE(shader_" + scene_names[i] + "_symbols), 0, shader_" + \
+            scene_names[i] + "_symbols, NULL },\n"
 header_source += "};\n"
 for i in range(len(scene_names)):
-    header_source += "#define shader_program_" + scene_names[i] + " (shader_programs[" + str(i) + "])\n"
+    header_source += "#define shader_program_" + \
+        scene_names[i] + " (shader_programs[" + str(i) + "])\n"
 header_source += "\n\n"
 
 header_source += "#endif\n"

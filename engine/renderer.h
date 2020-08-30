@@ -33,17 +33,24 @@ static PFNGLUNIFORM1FPROC glUniform1f;
 static PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
 static PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
 static PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
-static PFNGLNAMEDRENDERBUFFERSTORAGEEXTPROC glNamedRenderbufferStorageEXT;
+static PFNGLNAMEDRENDERBUFFERSTORAGEPROC glNamedRenderbufferStorageEXT;
 static PFNGLUNIFORM1IPROC glUniform1i;
 #ifdef WIN32
 static PFNGLACTIVETEXTUREPROC glActiveTexture;
 #endif
+// Compute
+static PFNGLCREATEBUFFERSPROC glCreateBuffers;
+static PFNGLNAMEDBUFFERDATAPROC glNamedBufferData;
+static PFNGLBINDBUFFERBASEPROC glBindBufferBase;
+static PFNGLDISPATCHCOMPUTEPROC glDispatchCompute;
+static PFNGLMEMORYBARRIERPROC glMemoryBarrier;
+static PFNGLMAPNAMEDBUFFERPROC glMapNamedBuffer;
 
 static void rInitializeRenderer()
 {
 #ifdef DEBUG_SHADER
-  log_info("OpenGL version %s", glGetString(GL_VERSION));
-  log_info("GLSL version   %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+  log_info("OpenGL version %s\n", glGetString(GL_VERSION));
+  log_info("GLSL version   %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 #endif
 
   // OpenGL extensions
@@ -64,9 +71,16 @@ static void rInitializeRenderer()
   glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)wglGetProcAddress("glGenFramebuffers");
   glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)wglGetProcAddress("glBindFramebuffer");
   glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)wglGetProcAddress("glFramebufferTexture2D");
-  glNamedRenderbufferStorageEXT = (PFNGLNAMEDRENDERBUFFERSTORAGEEXTPROC)wglGetProcAddress("glNamedRenderbufferStorage");
+  glNamedRenderbufferStorageEXT = (PFNGLNAMEDRENDERBUFFERSTORAGEPROC)wglGetProcAddress("glNamedRenderbufferStorage");
   glActiveTexture = (PFNGLACTIVETEXTUREPROC)wglGetProcAddress("glActiveTexture");
   glUniform1i = (PFNGLUNIFORM1IPROC)wglGetProcAddress("glUniform1i");
+  // Compute
+  glCreateBuffers = (PFNGLCREATEBUFFERSPROC)wglGetProcAddress("glCreateBuffers");
+  glNamedBufferData = (PFNGLNAMEDBUFFERDATAPROC)wglGetProcAddress("glNamedBufferData");
+  glBindBufferBase = (PFNGLBINDBUFFERBASEPROC)wglGetProcAddress("glBindBufferBase");
+  glDispatchCompute = (PFNGLDISPATCHCOMPUTEPROC)wglGetProcAddress("glDispatchCompute");
+  glMemoryBarrier = (PFNGLMEMORYBARRIERPROC)wglGetProcAddress("glMemoryBarrier");
+  glMapNamedBuffer = (PFNGLMAPNAMEDBUFFERPROC)wglGetProcAddress("glMapNamedBuffer");
 }
 
 int flip_buffers();

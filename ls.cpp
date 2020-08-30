@@ -405,6 +405,36 @@ void load_debug_output()
 
 #include "engine/shader.h"
 #include "shaders.gen.h"
+
+static const constexpr int ssbo_size_x = 512;
+struct ssbo_type {
+  float result[ssbo_size_x][2];
+};
+
+void compute_test()
+{
+  // Allocate SSBO
+  GLuint ssbo;
+  glCreateBuffers(1, &ssbo);
+  glNamedBufferData(ssbo, sizeof(ssbo_type), NULL, GL_STREAM_READ);
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
+
+  glUseProgram(shader_program_msx_exampleSound.handle);
+  glDispatchCompute(ssbo_size_x, 1, 1);
+
+  // Wait for the computation to finish and the effects to become visible (=caches have been written back)
+  glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+  // Copy SSBO to RAM
+  ssbo_type* ssbo_copy = (ssbo_type*)malloc(sizeof(ssbo_type));
+  ssbo_type* ssbo_access = (ssbo_type*)glMapNamedBuffer(ssbo, GL_READ_ONLY);
+  memcpy(ssbo_copy, ssbo_access, sizeof(ssbo_type));
+
+  for (int i = 0; i < ssbo_size_x; ++i) {
+    printf("(%f, %f), ", ssbo_copy->result[i][0], ssbo_copy->result[i][1]);
+  }
+}
+
 void load_demo()
 {
   printf("++++ Creating Loading bar.\n");
@@ -442,6 +472,8 @@ void load_demo()
   load_font();
 
   updateBar();
+
+  compute_test();
 
   load_compressed_sound();
   music_loading = 1;

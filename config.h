@@ -37,7 +37,7 @@ static const struct OpenGLSettings opengl_settings = {
     DoubleBuffer,         // swapChain
 
     4, // majorVersion
-    3, // minorVersion
+    5, // minorVersion
 
     0, // useSRGB
 
