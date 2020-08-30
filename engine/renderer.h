@@ -9,9 +9,11 @@
 
 #include <gl/GL.h>
 
-#include "GL/glext.h"
+#ifndef GL_GLEXT_VERSION
+#  include "GL/glext.h"
+#endif
 
-static int w = 1920, h = 1080;
+static unsigned int w = 1920, h = 1080;
 
 // OpenGL extensions
 static PFNGLGETPROGRAMIVPROC glGetProgramiv;

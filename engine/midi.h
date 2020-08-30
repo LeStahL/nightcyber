@@ -7,8 +7,13 @@
 
 #include <math.h>
 
-#define max(a, b) (a) > (b) ? (a) : (b)
-#define min(a, b) (a) < (b) ? (a) : (b)
+#ifndef max
+#  define max(a, b) (a) > (b) ? (a) : (b)
+#endif
+
+#ifndef min
+#  define min(a, b) (a) < (b) ? (a) : (b)
+#endif
 
 UINT nDevices, nOutputDevices;
 HMIDIOUT hAPC40mk2, hnanoKONTROL2;
@@ -150,7 +155,7 @@ void initKorgNanoKontrol2Input(void* callback)
 
   // Inputs
   MIDIINCAPS capabilities;
-  for (int i = 0; i < nDevices; ++i) {
+  for (unsigned int i = 0; i < nDevices; ++i) {
     midiInGetDevCaps(i, &capabilities, sizeof(MIDIINCAPS));
 
     HMIDIIN hMidiDevice;
@@ -169,7 +174,7 @@ void initApc40Mk2Input(void* callback)
 
   // Inputs
   MIDIINCAPS capabilities;
-  for (int i = 0; i < nDevices; ++i) {
+  for (unsigned int i = 0; i < nDevices; ++i) {
     midiInGetDevCaps(i, &capabilities, sizeof(MIDIINCAPS));
 
     HMIDIIN hMidiDevice;
@@ -188,14 +193,14 @@ void initControllers()
 
   // Inputs
   MIDIINCAPS capabilities;
-  for (int i = 0; i < nDevices; ++i) {
+  for (unsigned int i = 0; i < nDevices; ++i) {
     midiInGetDevCaps(i, &capabilities, sizeof(MIDIINCAPS));
 
     HMIDIIN hMidiDevice;
     if (!strcmp(capabilities.szPname, "APC40 mkII"))
-      midiInOpen(&hMidiDevice, i, (DWORD)(void*)MidiInProc_apc40mk2, 0, CALLBACK_FUNCTION);
+      midiInOpen(&hMidiDevice, i, (DWORD_PTR)MidiInProc_apc40mk2, 0, CALLBACK_FUNCTION);
     else if (!strcmp(capabilities.szPname, "nanoKONTROL2"))
-      midiInOpen(&hMidiDevice, i, (DWORD)(void*)MidiInProc_nanoKONTROL2, 0, CALLBACK_FUNCTION);
+      midiInOpen(&hMidiDevice, i, (DWORD_PTR)MidiInProc_nanoKONTROL2, 0, CALLBACK_FUNCTION);
     midiInStart(hMidiDevice);
   }
 
@@ -205,7 +210,7 @@ void initControllers()
 
   // Outputs
   MIDIOUTCAPS outCapabilites;
-  for (int i = 0; i < nOutputDevices; ++i) {
+  for (unsigned int i = 0; i < nOutputDevices; ++i) {
     midiOutGetDevCaps(i, &outCapabilites, sizeof(MIDIOUTCAPS));
 
     if (!strcmp(outCapabilites.szPname, "APC40 mkII")) {

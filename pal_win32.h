@@ -157,7 +157,7 @@ LRESULT CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
   case WM_COMMAND:
     switch (id) {
     case 5: {
-      selectedIndex = SendMessage(hSender, CB_GETCURSEL, 0, 0);
+      selectedIndex = (int)SendMessage(hSender, CB_GETCURSEL, 0, 0);
     } break;
     case 6:
       muted = !muted;
@@ -175,19 +175,19 @@ LRESULT CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
       break;
     case 8: // Full screen Antialiasing
     {
-      int index = SendMessage(hSender, CB_GETCURSEL, 0, 0);
+      int index = (int)SendMessage(hSender, CB_GETCURSEL, 0, 0);
       fsaa = (index + 1) * (index + 1);
     } break;
     case 9: // Texture buffer size
     {
-      int index = SendMessage(hSender, CB_GETCURSEL, 0, 0);
+      int index = (int)SendMessage(hSender, CB_GETCURSEL, 0, 0);
       texs = 128;
       for (int i = 0; i < index; ++i)
         texs *= 2;
       block_size = texs * texs;
     } break;
     case 10: {
-      start_at_scene = SendMessage(hSender, CB_GETCURSEL, 0, 0);
+      start_at_scene = (unsigned int)SendMessage(hSender, CB_GETCURSEL, 0, 0);
     } break;
 #ifdef RECORD
     case 11: // record checkbox
@@ -199,7 +199,7 @@ LRESULT CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
       EnableWindow(hframeratetext, recording);
     } break;
     case 13: // fps dropdown
-      int index = SendMessage(hSender, CB_GETCURSEL, 0, 0);
+      int index = (int)SendMessage(hSender, CB_GETCURSEL, 0, 0);
       if (index == 0)
         fps = 60;
       else if (index == 1)
@@ -613,11 +613,11 @@ void initialize_sound()
   hWaveOut = 0;
   int n_bits_per_sample = 16;
   WAVEFORMATEX wfx = {WAVE_FORMAT_PCM,
-                      channels,
-                      sample_rate,
-                      sample_rate * channels * n_bits_per_sample / 8,
-                      channels * n_bits_per_sample / 8,
-                      n_bits_per_sample,
+                      (WORD)channels,
+                      (DWORD)sample_rate,
+                      (DWORD)(sample_rate * channels * n_bits_per_sample / 8),
+                      (WORD)(channels * n_bits_per_sample / 8),
+                      (WORD)n_bits_per_sample,
                       0};
   waveOutOpen(&hWaveOut, WAVE_MAPPER, &wfx, 0, 0, CALLBACK_NULL);
 

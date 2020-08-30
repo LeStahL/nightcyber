@@ -16,6 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#ifdef WIN32
+#  define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <stdint.h>
 
 #include "Windows.h"
@@ -307,17 +311,17 @@ void load_compressed_sound()
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, snd_texture, 0);
 
   // Music allocs
-  nblocks1 = sample_rate * duration1 / block_size + 1;
+  nblocks1 = sample_rate * (int)duration1 / block_size + 1;
   music1_size = nblocks1 * block_size;
   smusic1 = (float*)malloc(4 * music1_size);
-  scale = (double*)malloc(4 * music1_size);
-  nBeats = (double*)malloc(4 * music1_size);
+  scale = (float*)malloc(sizeof(float) * music1_size);
+  nBeats = (double*)malloc(sizeof(double) * music1_size);
   short* dest = (short*)smusic1;
   for (int i = 0; i < 2 * music1_size; ++i)
     dest[i] = 0;
 
   // Load music shader
-  int sfx_size = strlen(sfx_frag);
+  int sfx_size = (int)strlen(sfx_frag);
   sfx_handle = glCreateShader(GL_FRAGMENT_SHADER);
   sfx_program = glCreateProgram();
   glShaderSource(sfx_handle, 1, (GLchar**)&sfx_frag, &sfx_size);
@@ -378,9 +382,9 @@ void load_sound_block(int music_block)
       dest[j] = (buf[j] - (1 << 15));
   else
     for (int j = 2 * music_block * block_size; j < 2 * (music_block + 1) * block_size; ++j)
-      dest[j] = 0.;
+      dest[j] = 0;
 
-  progress += .5 / nblocks1;
+  progress += .5f / (float)nblocks1;
 }
 
 #ifdef DEBUG
@@ -507,11 +511,11 @@ void draw()
 
   // Render post processing to screen
   glUseProgram(shader_program_gfx_post.handle);
-  glUniform2f(shader_uniform_gfx_post_iResolution, w, h);
-  glUniform1f(shader_uniform_gfx_post_iFSAA, fsaa);
+  glUniform2f(shader_uniform_gfx_post_iResolution, (float)w, (float)h);
+  glUniform1f(shader_uniform_gfx_post_iFSAA, (float)fsaa);
   glUniform1i(shader_uniform_gfx_post_iChannel0, 0);
-  glUniform1f(shader_uniform_gfx_post_iTime, t);
-  glUniform1f(shader_uniform_gfx_post_iScale, MAX(MIN(scale[index], 1.), 0.));
+  glUniform1f(shader_uniform_gfx_post_iTime, (float)t);
+  glUniform1f(shader_uniform_gfx_post_iScale, MAX(MIN(scale[index], 1.f), 0.f));
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, first_pass_texture);

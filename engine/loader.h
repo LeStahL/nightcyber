@@ -44,8 +44,8 @@ static void lDrawLoadingScreen()
   glClear(GL_COLOR_BUFFER_BIT);
 
   glUseProgram(shader_program_gfx_load.handle);
-  glUniform2f(shader_uniform_gfx_load_iResolution, w, h);
-  glUniform1f(shader_uniform_gfx_load_iProgress, fmin(fmax(progress, 0.), 1.));
+  glUniform2f(shader_uniform_gfx_load_iResolution, (float)w, (float)h);
+  glUniform1f(shader_uniform_gfx_load_iProgress, fminf(fmaxf(progress, 0.f), 1.f));
 
   quad();
 }

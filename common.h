@@ -21,6 +21,10 @@
 
 const char* demoname = "Corona";
 
+#ifdef WIN32
+#  define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include "config.h"
 #include "engine/loader.h"
 #include "engine/orchestrator.h"
@@ -30,8 +34,14 @@ const char* demoname = "Corona";
 
 #include <stddef.h>
 
-#define FALSE (0)
-#define TRUE (1)
+#ifndef FALSE
+#  define FALSE (0)
+#endif
+
+#ifndef TRUE
+#  define TRUE (1)
+#endif
+
 #define ABS(x) ((x) < 0 ? (-x) : (x))
 #define sign(x) ((x) < 0 ? -1. : 1.)
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
@@ -40,12 +50,12 @@ const char* demoname = "Corona";
 #ifdef WIN32
 #  define WIN32_LEAN_AND_MEAN
 #  define VC_EXTRALEAN
-#  include <windows.h>
+#  include <Mmreg.h>
 #  include <Windowsx.h>
 #  include <commctrl.h>
 #  include <mmsystem.h>
-#  include <Mmreg.h>
 #  include <vfw.h>
+#  include <windows.h>
 #endif
 
 #include <GL/gl.h>
@@ -152,10 +162,10 @@ int fixedSize;
 // Music shader globals
 int sample_rate = 44100, channels = 2;
 double duration1 = duration; // 3 min running time
-float *smusic1, *drums_raw;
-double *scale, *nBeats;
+float *smusic1, *drums_raw, *scale;
+double* nBeats;
 int music1_size;
-float texs = 512;
+int texs = 512;
 int block_size = 512 * 512, nblocks1;
 unsigned int paused = 0, recording = 0, muted = 0;
 char record_filename[1024];
