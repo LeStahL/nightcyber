@@ -155,7 +155,6 @@ int __cdecl main()
   for (int i = 1; i < nArgs; ++i) {
     sprintf(buffer, "%ws\0", szArglist[i]);
     const std::string filename = buffer;
-    printf("Processing file: %s\n", buffer);
     bool isFragmentShader = filename.compare(filename.size() - STRING_FRAG.size(), STRING_FRAG.size(), STRING_FRAG) == 0;
     FILE* f = fopen(buffer, "rb");
     if (!f) {
@@ -189,7 +188,6 @@ int __cdecl main()
       ExitProcess(-1);
       return -1;
     }
-    printf("Successfully compiled Shader: %s\n", buffer);
     glDeleteShader(handle);
     free(shaderSource);
   }
