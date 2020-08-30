@@ -1,0 +1,2 @@
+option('kkrunchy', type: 'boolean', value: true)
+option('squishy', type: 'boolean', value: true)
