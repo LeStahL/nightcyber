@@ -6,15 +6,15 @@
 class SurfaceObject : public SurfaceNode
 {
 public:
-    SurfaceObject(QPointF position = QPointF(0.,0.));
-    
-    virtual ~SurfaceObject();
-    
-    void setPosition(const QPointF position);
-    const QPointF position() const;
-    
+  SurfaceObject(QPointF position = QPointF(0., 0.));
+
+  virtual ~SurfaceObject();
+
+  void setPosition(const QPointF position);
+  const QPointF position() const;
+
 private:
-    QPointF m_position;
+  QPointF m_position;
 };
 
 #endif

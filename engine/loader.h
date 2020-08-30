@@ -9,90 +9,82 @@
 // Generated resources
 #include "shaders.gen.h"
 
-
 #define lNumberOfSymbols (ARRAYSIZE(shader_symbols))
 #define lNumberOfPrograms (ARRAYSIZE(shader_programs))
 
 #define lLoadProgressStep (0.2f / (lNumberOfSymbols + lNumberOfPrograms))
 
-
 static float progress = 0.f;
-
 
 static void lInitializeLoader()
 {
-    // Load loading bar shader
-    sCompileShaderProgram(&shader_program_gfx_load, shader_symbols);
+  // Load loading bar shader
+  sCompileShaderProgram(&shader_program_gfx_load, shader_symbols);
 }
 
 #ifdef DEBUG_SHADER
 static const char* lGetShaderError()
 {
-    for (size_t index = 0; index < shader_program_gfx_load.numberOfSymbols; ++index)
-    {
-        if (shader_symbols[shader_program_gfx_load.symbols[index]].compileStatus != GL_TRUE)
-        {
-            return shader_symbols[shader_program_gfx_load.symbols[index]].compilerError;
-        }
+  for (size_t index = 0; index < shader_program_gfx_load.numberOfSymbols; ++index) {
+    if (shader_symbols[shader_program_gfx_load.symbols[index]].compileStatus != GL_TRUE) {
+      return shader_symbols[shader_program_gfx_load.symbols[index]].compilerError;
     }
+  }
 
-    if (shader_program_gfx_load.linkStatus != GL_TRUE)
-    {
-        return shader_program_gfx_load.linkerError;
-    }
+  if (shader_program_gfx_load.linkStatus != GL_TRUE) {
+    return shader_program_gfx_load.linkerError;
+  }
 
-    return NULL;
+  return NULL;
 }
 #endif
 
 static void lDrawLoadingScreen()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(shader_program_gfx_load.handle);
-    glUniform2f(shader_uniform_gfx_load_iResolution, w, h);
-    glUniform1f(shader_uniform_gfx_load_iProgress, fmin(fmax(progress,0.),1.));
+  glUseProgram(shader_program_gfx_load.handle);
+  glUniform2f(shader_uniform_gfx_load_iResolution, w, h);
+  glUniform1f(shader_uniform_gfx_load_iProgress, fmin(fmax(progress, 0.), 1.));
 
-    quad();
+  quad();
 }
 
 // TODO(ca) Rename function to match naming scheme
 static void updateBar()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // Render first pass
-    glViewport(0,0,w,h);
+  // Render first pass
+  glViewport(0, 0, w, h);
 
-    lDrawLoadingScreen();
+  lDrawLoadingScreen();
 
-    flip_buffers();
+  flip_buffers();
 
-    glUseProgram(0);
+  glUseProgram(0);
 }
 
 static void lLoadAllSymbols()
 {
-    for (unsigned int symbolIndex = 0; symbolIndex < lNumberOfSymbols; ++symbolIndex)
-    {
-        sCompileSymbol(shader_symbols + symbolIndex);
+  for (unsigned int symbolIndex = 0; symbolIndex < lNumberOfSymbols; ++symbolIndex) {
+    sCompileSymbol(shader_symbols + symbolIndex);
 
-        progress += lLoadProgressStep;
+    progress += lLoadProgressStep;
 
-        updateBar();
-    }
+    updateBar();
+  }
 }
 
 static void lLoadAllPrograms()
 {
-    for (unsigned int programIndex = 0; programIndex < lNumberOfPrograms; ++programIndex)
-    {
-        sCompileShaderProgram(shader_programs + programIndex, shader_symbols);
+  for (unsigned int programIndex = 0; programIndex < lNumberOfPrograms; ++programIndex) {
+    sCompileShaderProgram(shader_programs + programIndex, shader_symbols);
 
-        progress += lLoadProgressStep;
+    progress += lLoadProgressStep;
 
-        updateBar();
-    }
+    updateBar();
+  }
 }
 
 #endif // LOADER_H

@@ -5,14 +5,14 @@
 
 #include "SurfaceNode.hpp"
 
-class SurfaceScene 
+class SurfaceScene
 {
 public:
-    SurfaceScene();
-    virtual ~SurfaceScene();
-    
+  SurfaceScene();
+  virtual ~SurfaceScene();
+
 private:
-    QList<SurfaceNode *> m_contained_nodes;
+  QList<SurfaceNode*> m_contained_nodes;
 };
 
 #endif

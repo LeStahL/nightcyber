@@ -2,13 +2,14 @@
 #define RENDERER_H
 
 #ifdef WIN32
-#	define WIN32_LEAN_AND_MEAN
-#	define VC_EXTRALEAN
-#	include <Windows.h>
+#  define WIN32_LEAN_AND_MEAN
+#  define VC_EXTRALEAN
+#  include <Windows.h>
 #endif
-#include <gl/GL.h>
-#include <GL/glext.h>
 
+#include <gl/GL.h>
+
+#include "GL/glext.h"
 
 static int w = 1920, h = 1080;
 
@@ -39,44 +40,44 @@ static PFNGLACTIVETEXTUREPROC glActiveTexture;
 static void rInitializeRenderer()
 {
 #ifdef DEBUG_SHADER
-    log_info("OpenGL version %s", glGetString(GL_VERSION));
-    log_info("GLSL version   %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+  log_info("OpenGL version %s", glGetString(GL_VERSION));
+  log_info("GLSL version   %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 #endif
 
-    // OpenGL extensions
-    glGetProgramiv = (PFNGLGETPROGRAMIVPROC) wglGetProcAddress("glGetProgramiv");
-    glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC) wglGetProcAddress("glGetProgramInfoLog");
-    glGetShaderiv = (PFNGLGETSHADERIVPROC) wglGetProcAddress("glGetShaderiv");
-    glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC) wglGetProcAddress("glGetShaderInfoLog");
-    glCreateShader = (PFNGLCREATESHADERPROC) wglGetProcAddress("glCreateShader");
-    glCreateProgram = (PFNGLCREATEPROGRAMPROC) wglGetProcAddress("glCreateProgram");
-    glShaderSource = (PFNGLSHADERSOURCEPROC) wglGetProcAddress("glShaderSource");
-    glCompileShader = (PFNGLCOMPILESHADERPROC) wglGetProcAddress("glCompileShader");
-    glAttachShader = (PFNGLATTACHSHADERPROC) wglGetProcAddress("glAttachShader");
-    glLinkProgram = (PFNGLLINKPROGRAMPROC) wglGetProcAddress("glLinkProgram");
-    glUseProgram = (PFNGLUSEPROGRAMPROC) wglGetProcAddress("glUseProgram");
-    glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC) wglGetProcAddress("glGetUniformLocation");
-    glUniform2f = (PFNGLUNIFORM2FPROC) wglGetProcAddress("glUniform2f");
-    glUniform1f = (PFNGLUNIFORM1FPROC) wglGetProcAddress("glUniform1f");
-    glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC) wglGetProcAddress("glGenFramebuffers");
-    glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC) wglGetProcAddress("glBindFramebuffer");
-    glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC) wglGetProcAddress("glFramebufferTexture2D");
-    glNamedRenderbufferStorageEXT = (PFNGLNAMEDRENDERBUFFERSTORAGEEXTPROC) wglGetProcAddress("glNamedRenderbufferStorage");
-    glActiveTexture = (PFNGLACTIVETEXTUREPROC) wglGetProcAddress("glActiveTexture");
-    glUniform1i = (PFNGLUNIFORM1IPROC) wglGetProcAddress("glUniform1i");
+  // OpenGL extensions
+  glGetProgramiv = (PFNGLGETPROGRAMIVPROC)wglGetProcAddress("glGetProgramiv");
+  glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)wglGetProcAddress("glGetProgramInfoLog");
+  glGetShaderiv = (PFNGLGETSHADERIVPROC)wglGetProcAddress("glGetShaderiv");
+  glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)wglGetProcAddress("glGetShaderInfoLog");
+  glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader");
+  glCreateProgram = (PFNGLCREATEPROGRAMPROC)wglGetProcAddress("glCreateProgram");
+  glShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource");
+  glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader");
+  glAttachShader = (PFNGLATTACHSHADERPROC)wglGetProcAddress("glAttachShader");
+  glLinkProgram = (PFNGLLINKPROGRAMPROC)wglGetProcAddress("glLinkProgram");
+  glUseProgram = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram");
+  glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation");
+  glUniform2f = (PFNGLUNIFORM2FPROC)wglGetProcAddress("glUniform2f");
+  glUniform1f = (PFNGLUNIFORM1FPROC)wglGetProcAddress("glUniform1f");
+  glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)wglGetProcAddress("glGenFramebuffers");
+  glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)wglGetProcAddress("glBindFramebuffer");
+  glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)wglGetProcAddress("glFramebufferTexture2D");
+  glNamedRenderbufferStorageEXT = (PFNGLNAMEDRENDERBUFFERSTORAGEEXTPROC)wglGetProcAddress("glNamedRenderbufferStorage");
+  glActiveTexture = (PFNGLACTIVETEXTUREPROC)wglGetProcAddress("glActiveTexture");
+  glUniform1i = (PFNGLUNIFORM1IPROC)wglGetProcAddress("glUniform1i");
 }
 
 int flip_buffers();
 
 void quad()
 {
-    glBegin(GL_QUADS);
-    glVertex3f(-1,-1,0);
-    glVertex3f(-1,1,0);
-    glVertex3f(1,1,0);
-    glVertex3f(1,-1,0);
-    glEnd();
-    glFlush();
+  glBegin(GL_QUADS);
+  glVertex3f(-1, -1, 0);
+  glVertex3f(-1, 1, 0);
+  glVertex3f(1, 1, 0);
+  glVertex3f(1, -1, 0);
+  glEnd();
+  glFlush();
 }
 
 #endif // RENDERER_H

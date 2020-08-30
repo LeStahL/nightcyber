@@ -18,7 +18,7 @@ const double start_times[] = {
     t_tentacles,
 };
 
-const char *scene_names[] = {
+const char* scene_names[] = {
     "Logo 210",
     "Corona",
     "Menger Sponge",

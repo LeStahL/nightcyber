@@ -3,19 +3,18 @@
 
 #include <QOpenGLWidget>
 
-
 class RenderViewWidget : public QOpenGLWidget
 {
 public:
-	RenderViewWidget(QWidget* parent = nullptr);
+  RenderViewWidget(QWidget* parent = nullptr);
 
 protected:
-	void initializeGL() override;
-	void resizeGL(int w, int h) override;
-	void paintGL() override;
+  void initializeGL() override;
+  void resizeGL(int w, int h) override;
+  void paintGL() override;
 
 private:
-	void setup();
+  void setup();
 };
 
 #endif // RENDERVIEWWIDGET_H

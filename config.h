@@ -20,36 +20,36 @@
 #define CONFIG_H
 
 #ifdef DEBUG_SHADER
-#   ifdef DEMO
-#       define log_info printf
-#   else
-#       include <QtGlobal>
-#       define log_info qInfo
-#   endif
+#  ifdef DEMO
+#    define log_info printf
+#  else
+#    include <QtGlobal>
+#    define log_info qInfo
+#  endif
 #else
-#   define log_info(...)
+#  define log_info(...)
 #endif
 
 #include "config_types.h"
 
 static const struct OpenGLSettings opengl_settings = {
     CompatibilityProfile, // profile
-	DoubleBuffer, // swapChain
+    DoubleBuffer,         // swapChain
 
     4, // majorVersion
     3, // minorVersion
 
-	0, // useSRGB
+    0, // useSRGB
 
-	8, // redBits
-	8, // greenBits
-	8, // blueBits
-	8, // alphaBits
+    8, // redBits
+    8, // greenBits
+    8, // blueBits
+    8, // alphaBits
 
-	24, // depthBits
-	8, // stencilBits
+    24, // depthBits
+    8,  // stencilBits
 
-	1, // samples (for Multisampling)
+    1, // samples (for Multisampling)
 };
 
 #endif

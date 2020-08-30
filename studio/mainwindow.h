@@ -7,21 +7,21 @@
 class MainWindow : public QMainWindow
 {
 public:
-	MainWindow();
+  MainWindow();
 
-    void setTimeNow(double timeNow);
-    void setTimeRange(double timeStart, double timeEnd);
+  void setTimeNow(double timeNow);
+  void setTimeRange(double timeStart, double timeEnd);
 
 protected slots:
-    void onChangeTimeNowSlider(int timeNow);
-    void onChangeTimeNowSpinBox(double timeNow);
+  void onChangeTimeNowSlider(int timeNow);
+  void onChangeTimeNowSpinBox(double timeNow);
 
 private:
-    void setControlsTimeNow(double timeNow);
-    void setControlsTimeRange(double timeStart, double timeEnd);
+  void setControlsTimeNow(double timeNow);
+  void setControlsTimeRange(double timeStart, double timeEnd);
 
 private:
-	Ui::MainWindow window;
+  Ui::MainWindow window;
 };
 
 #endif // MAINWINDOW_H

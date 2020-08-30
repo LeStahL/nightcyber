@@ -20,17 +20,17 @@
 
 #include <SDL2/SDL.h>
 
-void ExitProcess(int exit_code) {
-	exit(exit_code);
+void ExitProcess(int exit_code) { exit(exit_code); }
+
+int main()
+{
+  // TODO(ca) Implement me
+  return 0;
 }
 
-int main() {
-	//TODO(ca) Implement me
-	return 0;
-}
-
-void flip_buffers() {
-	//TODO(ca) Implement me
+void flip_buffers()
+{
+  // TODO(ca) Implement me
 }
 
 #endif
