@@ -13,5 +13,6 @@
         "xmemory0": "cpp",
         "xstring": "cpp",
         "xutility": "cpp"
-    }
+    },
+    "glsl-canvas.useCompactFormatter": false
 }
