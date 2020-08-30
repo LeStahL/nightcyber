@@ -45,6 +45,9 @@ int _fltused = 0;
 #  include "engine/debug.h"
 #endif
 
+#include "engine/compute.h"
+#include "engine/shader.h"
+
 #ifdef MIDI
 /*
 int btns = 1;
@@ -403,7 +406,6 @@ void load_debug_output()
 
 #endif
 
-#include "engine/shader.h"
 #include "shaders.gen.h"
 
 static const constexpr int ssbo_size_x = 512;
@@ -414,21 +416,18 @@ struct ssbo_type {
 void compute_test()
 {
   // Allocate SSBO
-  GLuint ssbo;
-  glCreateBuffers(1, &ssbo);
-  glNamedBufferData(ssbo, sizeof(ssbo_type), NULL, GL_STREAM_READ);
-  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
+  GLuint ssbo = cAllocateBuffer(sizeof(ssbo_type), GL_STREAM_READ);
 
-  glUseProgram(shader_program_msx_exampleSound.handle);
-  glDispatchCompute(ssbo_size_x, 1, 1);
+  cBindBuffer(0, ssbo);
+
+  cDispatchCompute(shader_program_msx_exampleSound.handle, ssbo_size_x);
 
   // Wait for the computation to finish and the effects to become visible (=caches have been written back)
-  glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+  cMemoryBarrier();
 
   // Copy SSBO to RAM
   ssbo_type* ssbo_copy = (ssbo_type*)malloc(sizeof(ssbo_type));
-  ssbo_type* ssbo_access = (ssbo_type*)glMapNamedBuffer(ssbo, GL_READ_ONLY);
-  memcpy(ssbo_copy, ssbo_access, sizeof(ssbo_type));
+  cCopyFromBuffer(ssbo, ssbo_copy, sizeof(ssbo_type));
 
   for (int i = 0; i < ssbo_size_x; ++i) {
     printf("(%f, %f), ", ssbo_copy->result[i][0], ssbo_copy->result[i][1]);

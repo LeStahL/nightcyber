@@ -7,16 +7,16 @@ layout(local_size_x = 1, local_size_y = 1)in;
 
 layout(std430, binding = 0)buffer InputType
 {
-    vec2 input[N_SAMPLES][N_NOTES];
+    vec2 notes[N_SAMPLES][N_NOTES];
 };
 
 layout(std430, binding = 1)buffer ResultType
 {
-    vec2 result[N_SAMPLES][N_NOTES];
+    vec2 postprocessedNotes[N_SAMPLES][N_NOTES];
 };
 
 void main() {
     ivec2 index = ivec2(gl_GlobalInvocationID.xy);
     
-    result[index.x][index.y] = input[index.x][index.y];
+    postprocessedNotes[index.x][index.y] = notes[index.x][index.y];
 }

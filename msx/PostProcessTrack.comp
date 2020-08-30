@@ -6,16 +6,16 @@ layout(local_size_x = 1)in;
 
 layout(std430, binding = 0)buffer InputType
 {
-    vec2 result[N_SAMPLES_TRACK];
+    vec2 track[N_SAMPLES_TRACK];
 };
 
 layout(std430, binding = 1)buffer ResultType
 {
-    vec2 result[N_SAMPLES_TRACK];
+    vec2 postprocessedTrack[N_SAMPLES_TRACK];
 };
 
 void main() {
     ivec2 index = ivec2(gl_GlobalInvocationID.xy);
     
-    result[index.x] = input[index.x];
+    postprocessedTrack[index.x] = track[index.x];
 }

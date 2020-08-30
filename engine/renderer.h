@@ -40,11 +40,13 @@ static PFNGLACTIVETEXTUREPROC glActiveTexture;
 #endif
 // Compute
 static PFNGLCREATEBUFFERSPROC glCreateBuffers;
+static PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 static PFNGLNAMEDBUFFERDATAPROC glNamedBufferData;
 static PFNGLBINDBUFFERBASEPROC glBindBufferBase;
 static PFNGLDISPATCHCOMPUTEPROC glDispatchCompute;
 static PFNGLMEMORYBARRIERPROC glMemoryBarrier;
 static PFNGLMAPNAMEDBUFFERPROC glMapNamedBuffer;
+static PFNGLUNMAPNAMEDBUFFERPROC glUnmapNamedBuffer;
 
 static void rInitializeRenderer()
 {
@@ -76,11 +78,13 @@ static void rInitializeRenderer()
   glUniform1i = (PFNGLUNIFORM1IPROC)wglGetProcAddress("glUniform1i");
   // Compute
   glCreateBuffers = (PFNGLCREATEBUFFERSPROC)wglGetProcAddress("glCreateBuffers");
+  glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)wglGetProcAddress("glDeleteBuffers");
   glNamedBufferData = (PFNGLNAMEDBUFFERDATAPROC)wglGetProcAddress("glNamedBufferData");
   glBindBufferBase = (PFNGLBINDBUFFERBASEPROC)wglGetProcAddress("glBindBufferBase");
   glDispatchCompute = (PFNGLDISPATCHCOMPUTEPROC)wglGetProcAddress("glDispatchCompute");
   glMemoryBarrier = (PFNGLMEMORYBARRIERPROC)wglGetProcAddress("glMemoryBarrier");
   glMapNamedBuffer = (PFNGLMAPNAMEDBUFFERPROC)wglGetProcAddress("glMapNamedBuffer");
+  glUnmapNamedBuffer = (PFNGLUNMAPNAMEDBUFFERPROC)wglGetProcAddress("glUnmapNamedBuffer");
 }
 
 int flip_buffers();
