@@ -45,11 +45,11 @@ set(STRINGS_FILE font/strings.txt)
 #################################
 # Shader compiler executable
 #################################
-add_subdirectory(cmake)
+add_subdirectory(shader-compiler)
 add_custom_target(verify_shaders
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
     SOURCES ${SHADER_FILES} ${SHADER_SYMBOLS_FILES}
-    COMMAND scomp ${SHADER_FILES} ${SHADER_SYMBOLS_FILES}
+    COMMAND shader-compiler ${SHADER_FILES} ${SHADER_SYMBOLS_FILES}
 )
 
 #################################
@@ -94,7 +94,7 @@ add_executable(${PROJECT_NAME}
 add_dependencies(${PROJECT_NAME} minify_sfx)
 add_dependencies(${PROJECT_NAME} minify_shaders)
 add_dependencies(${PROJECT_NAME} texture_packing)
-add_dependencies(${PROJECT_NAME} scomp)
+add_dependencies(${PROJECT_NAME} shader-compiler)
 add_dependencies(${PROJECT_NAME} verify_shaders)
 
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE "${OPENGL_INCLUDE_DIR}")
@@ -113,7 +113,7 @@ if(MSVC)
     endif()
 
     if (CMAKE_SIZEOF_VOID_P EQUAL 4 AND MINIFY_64K AND (MSVC_IDE OR CMAKE_BUILD_TYPE STREQUAL "Release"))
-        target_compile_options(${PROJECT_NAME} PRIVATE /O1)
+        target_compile_options(${PROJECT_NAME} PRIVATE /O2)
         target_compile_definitions(${PROJECT_NAME} PRIVATE "$<$<CONFIG:RELEASE>:MINIFY_64K>")
         find_program(KKRUNCHY_K7 kkrunchy_k7.exe HINTS "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}/bin")
         add_custom_command(TARGET ${PROJECT_NAME} COMMAND "$<$<CONFIG:RELEASE>:${KKRUNCHY_K7}>" ARGS --best "$<TARGET_FILE:${PROJECT_NAME}>" --out "$<TARGET_FILE_DIR:${PROJECT_NAME}>/${PROJECT_NAME}c.exe" POST_BUILD)

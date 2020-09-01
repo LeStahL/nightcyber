@@ -1,28 +1,34 @@
 project('nightcyber', 'cpp')
 
+cppCompiler = meson.get_compiler('cpp')
+
 # Dependencies
 qt5 = import('qt5' )
 qt5Dependencies = dependency('qt5', method: 'qmake', cmake_module_path: 'C:\\Qt\\5.15.0\\msvc2019_64', modules: ['Core', 'Widgets', 'Gui', 'Multimedia', 'OpenGL'])
+
 opengl = dependency('gl')
-qMidi = subproject('QMidi')
-cppCompiler = meson.get_compiler('cpp')
-winmm = cppCompiler.find_library('winmm')
+
+# Windows-specific libraries
+if build_machine.system() == 'windows'
+    winmm = cppCompiler.find_library('winmm')
+    user32 = cppCompiler.find_library('user32')
+    ucrt = cppCompiler.find_library('ucrt')
+    msvcrt = cppCompiler.find_library('msvcrt')
+    vcruntime = cppCompiler.find_library('vcruntime')
+endif
 
 # Programs needed
 python3 = find_program('python3')
+glslangValidator = find_program('glslangValidator', 'bin/glslangValidator')
 
 # Globber paths
-qtGlobberPath = meson.source_root() + '/meson/Qt5Globber.py'
-globberPath = meson.source_root() + '/meson/Globber.py'
-
-# Build shader verifyer
-executable('scomp', meson.source_root() + '/cmake/scomp.cpp', dependencies: [opengl])
-scomp = find_program(meson.build_root() + '/scomp', required: false)
+qtGlobberPath = 'meson/Qt5Globber.py'
+globberPath = 'meson/Globber.py'
 
 # Verify all shaders
-if scomp.found()
+if glslangValidator.found()
     allFragmentShaderFiles = run_command(globberPath, 'frag', meson.source_root()).stdout().strip().split('\n')
-    verifyShadersResult = run_command(meson.build_root() + '/scomp', allFragmentShaderFiles)
+    verifyShadersResult = run_command(glslangValidator, allFragmentShaderFiles)
     message(verifyShadersResult.stdout())
 endif
     
